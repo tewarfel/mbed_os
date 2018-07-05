@@ -82,9 +82,11 @@ public:
             sizeof(charTable) / sizeof(GattCharacteristic *)
         );
 
-        ble.addService(batteryService);
+        ble.gattServer().addService(batteryService);
     }
 
+  
+  
     /**
      * Update the battery charge level that the service exposes.
      *

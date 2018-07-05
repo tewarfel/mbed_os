@@ -99,7 +99,7 @@ public:
         GattService         deviceInformationService(GattService::UUID_DEVICE_INFORMATION_SERVICE, charTable,
                                                      sizeof(charTable) / sizeof(GattCharacteristic *));
 
-        ble.addService(deviceInformationService);
+        ble.gattServer().addService(deviceInformationService);
         serviceAdded = true;
     }
 

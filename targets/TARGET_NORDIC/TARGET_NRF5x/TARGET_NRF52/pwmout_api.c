@@ -73,6 +73,9 @@ static nrf_drv_pwm_t nordic_nrf5_pwm_instance[] = {
 #endif
 };
 
+/* Keep track of which instance has been initialized. */
+static bool nordic_nrf5_pwm_initialized[4] = {false, false, false, false};
+
 /* Helper function for (re)initializing the PWM instance.
  */
 static void nordic_pwm_init(pwmout_t *obj)
@@ -99,7 +102,9 @@ static void nordic_pwm_init(pwmout_t *obj)
     };
 
     /* Make sure PWM instance is not running before making changes. */
-    nrf_drv_pwm_uninit(&nordic_nrf5_pwm_instance[obj->instance]);
+    if (nordic_nrf5_pwm_initialized[obj->instance]) {
+      nrf_drv_pwm_uninit(&nordic_nrf5_pwm_instance[obj->instance]);
+    }
 
     /* Initialize instance with new configuration. */
     ret_code_t result = nrf_drv_pwm_init(&nordic_nrf5_pwm_instance[obj->instance],
@@ -107,6 +112,7 @@ static void nordic_pwm_init(pwmout_t *obj)
                                          NULL);
 
     MBED_ASSERT(result == NRF_SUCCESS);
+    nordic_nrf5_pwm_initialized[obj->instance]=true;
 }
 
 /* Helper function for reinitializing the PWM instance and setting the duty-cycle. */
@@ -167,8 +173,11 @@ void pwmout_free(pwmout_t *obj)
 
     MBED_ASSERT(obj);
 
+
     /* Uninitialize PWM instance. */
     nrf_drv_pwm_uninit(&nordic_nrf5_pwm_instance[obj->instance]);
+    nordic_nrf5_pwm_initialized[obj->instance]=false;
+
 }
 
 /** Set the output duty-cycle in range <0.0f, 1.0f>
